@@ -1,1 +1,3 @@
+# envoirement 
 .venv/
+__pycache__/
