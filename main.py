@@ -1,7 +1,9 @@
 import typer
-from os import path, makedirs, scandir
+from os import path, makedirs, rmdir, scandir
 import requests, zipfile, io
 from config import config
+from shutil import rmtree
+
 
 wp_cli = typer.Typer()
 
@@ -43,12 +45,13 @@ def is_installed():
 def plugin_list(output=False):
     if is_installed:
         for dir in scandir(inst_path + "/wordpress/wp-content/plugins"):
-            if dir.is_dir() and not output:
-                typer.echo(dir)
-            elif dir.is_dir() and output:
-                p_list: list
-                p_list += dir
-                return p_list
+            if dir.is_dir():
+                typer.echo(dir.name)
+
+@wp_cli.command()
+def delete_installation():
+    rmtree(root_path + "/Wordpress")
+
 
             
 
