@@ -1,3 +1,0 @@
-def asdasd():
-    print("hi")
-

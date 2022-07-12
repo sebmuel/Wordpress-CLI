@@ -1,3 +1,4 @@
 # envoirement 
 .venv/
 __pycache__/
+versions
