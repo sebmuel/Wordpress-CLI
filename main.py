@@ -34,8 +34,9 @@ def pull_latest(force: bool = False):
     if os.path.exists(os.path.join(root_path, deploy_dir + ".installed.json")) and not force:
         with open(os.path.join(root_path, deploy_dir + ".installed.json")) as data:
             current_data = json.load(data)
-            if get_latest_version_number() in current_data.get("installed"):
-                print("same_version")
+            current_version = get_latest_version_number()
+            if current_version in current_data.get("installed"):
+                typer.echo(f"version {current_version} is already installed")
                 return
     # check if json file exists if not fetch them and store them
     if not os.path.exists(os.path.join(root_path, (deploy_dir + version_list))) or not os.path.exists(os.path.join(root_path, deploy_dir + download_list)):
@@ -89,7 +90,14 @@ def update():
 
 @app.command()
 def create_deploy(name: str):
-    pass
+    #TODO check if verison exists
+    if os.path.exists(os.path.join(root_path, name)):
+        typer.echo(f"Deploy with the name: '{name}' already exists")
+        return
+    os.mkdir(os.path.join(root_path, name))
+    with zipfile.ZipFile(os.path.join(root_path, deploy_dir + f"wordpress-{get_latest_version_number()}.zip"), 'r') as zip_ref:
+        zip_ref.extractall(os.path.join(root_path, name))
+    typer.echo(f"Version: {get_latest_version_number()} has been installed -> {os.path.join(root_path, name)}")
 
 
 def show_progress(block_num, block_size, total_size):
