@@ -1,3 +1,6 @@
 {
-    "root": "/home/sebastian/Backups/Wordpress/"
+    "root": "/home/sebastian/Backups/Wordpress/",
+    "deploy_folder": "deploy/",
+    "version_list": ".version.json",
+    "download_list": ".download.json"
 }       
