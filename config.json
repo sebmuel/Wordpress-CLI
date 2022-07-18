@@ -3,5 +3,9 @@
     "deploy_folder": "deploy/",
     "version_list": ".version.json",
     "download_list": ".download.json",
-    "deploy_prefix": "_deploy"
+    "deploy_prefix": "_deploy",
+    "db_host": "localhost",
+    "db_user": "wpCLI",
+    "db_pw": "\"2Z+Vk#H6\"y.v:wrzT*?",
+    "db": "wp_cli"
 }       

@@ -1,3 +1,4 @@
+#!/home/sebastian/Skripts/wp-cli/.venv/bin/python3.9
 import progressbar
 import json
 import typer
@@ -12,8 +13,9 @@ app = typer.Typer()
 
 
 def load_config():
-    __location__ = os.path.realpath(os.path.join(
-        os.getcwd(), os.path.dirname(__file__)))
+    __location__ = os.path.realpath(
+        os.path.join(os.getcwd(), os.path.dirname(__file__))
+    )
     # TODO ERROR HANDLING
     with open(os.path.join(__location__, "config.json")) as conf:
         config = json.load(conf)
@@ -22,7 +24,7 @@ def load_config():
 
 def parse_params(params: dict):
     outter_key = "&request[fields]"
-    url = ''
+    url = ""
     for param in params.items():
         key = param[0]
         value = param[1]
@@ -50,10 +52,14 @@ def show_progress(block_num, block_size, total_size):
         pbar.finish()
         pbar = None
 
+
 @app.command()
 def pull_latest(force: bool = False):
     # TODO do a check if the an installed zip file exists
-    if os.path.exists(os.path.join(root_path, deploy_dir + ".installed.json")) and not force:
+    if (
+        os.path.exists(os.path.join(root_path, deploy_dir + ".installed.json"))
+        and not force
+    ):
         with open(os.path.join(root_path, deploy_dir + ".installed.json")) as data:
             current_data = json.load(data)
             current_version = get_latest_version_number()
@@ -61,25 +67,34 @@ def pull_latest(force: bool = False):
                 typer.echo(f"version {current_version} is already installed")
                 return
     # check if json file exists if not fetch them and store them
-    if not os.path.exists(os.path.join(root_path, (deploy_dir + version_list))) or not os.path.exists(os.path.join(root_path, deploy_dir + download_list)):
+    if not os.path.exists(
+        os.path.join(root_path, (deploy_dir + version_list))
+    ) or not os.path.exists(os.path.join(root_path, deploy_dir + download_list)):
         typer.echo(
-            f"could not find .version.json file path: {os.path.join(root_path, (deploy_dir + version_list))}")
+            f"could not find .version.json file path: {os.path.join(root_path, (deploy_dir + version_list))}"
+        )
         update()
     latest_version_number = get_latest_version_number()
     with open(os.path.join(root_path, deploy_dir + download_list)) as dl_list:
         download_dict = json.load(dl_list)
         for version in download_dict["offers"]:
-            if latest_version_number in version["download"] and version["response"] == "upgrade":
+            if (
+                latest_version_number in version["download"]
+                and version["response"] == "upgrade"
+            ):
                 download_url = version["download"]
                 break
         typer.echo(f"Downloading Wordpress Version {latest_version_number}")
-        request = urllib.request.urlretrieve(download_url,
-                                             f"{os.path.join(root_path, deploy_dir)}wordpress-{latest_version_number}.zip", show_progress)
+        request = urllib.request.urlretrieve(
+            download_url,
+            f"{os.path.join(root_path, deploy_dir)}wordpress-{latest_version_number}.zip",
+            show_progress,
+        )
         typer.echo(f"finished...")
-        installed_file = {
-            "installed": get_latest_version_number()
-        }
-        with open(os.path.join(root_path, deploy_dir + ".installed.json"), "w") as insalled_json:
+        installed_file = {"installed": get_latest_version_number()}
+        with open(
+            os.path.join(root_path, deploy_dir + ".installed.json"), "w"
+        ) as insalled_json:
             json.dump(installed_file, insalled_json)
 
 
@@ -87,6 +102,7 @@ def pull_latest(force: bool = False):
 def get_latest_version_number():
     with open(os.path.join(root_path, deploy_dir + version_list)) as json_file:
         lines = json.load(json_file)
+        print(lines)
         for key, value in lines.items():
             if value == "latest":
                 return key
@@ -106,13 +122,15 @@ def update():
     download_list_request = requests.get(download_endpoint)
     request_data = download_list_request.json()
     if download_list_request.status_code == 200:
-        with open(os.path.join(root_path, deploy_dir + download_list), "w") as json_file:
+        with open(
+            os.path.join(root_path, deploy_dir + download_list), "w"
+        ) as json_file:
             json.dump(request_data, json_file)
             typer.echo(f"updated download list from {download_endpoint}")
 
 
 @app.command()
-def create_deploy(name: str, clean: bool=False):
+def create_deploy(name: str, clean: bool = False):
     if name == deploy_prefix:
         typer.echo(f"The name: {name} is reserved for the deploy prefix!")
         rechoice_name = input(f"choose a differnt name ...: ")
@@ -126,11 +144,18 @@ def create_deploy(name: str, clean: bool=False):
         typer.echo(f"Deploy with the name: '{name}' already exists")
         return
     os.mkdir(os.path.join(root_path, name + deploy_prefix))
-    with zipfile.ZipFile(os.path.join(root_path, deploy_dir + f"wordpress-{get_latest_version_number()}.zip"), 'r') as zip_ref:
+    with zipfile.ZipFile(
+        os.path.join(
+            root_path, deploy_dir +
+            f"wordpress-{get_latest_version_number()}.zip"
+        ),
+        "r",
+    ) as zip_ref:
         zip_ref.extractall(os.path.join(root_path, name + deploy_prefix))
     typer.echo(
-        f"Version: {get_latest_version_number()} has been installed -> {deploy_uri + deploy_prefix}")
-    # if clean is True clean default themes and plugins from 
+        f"Version: {get_latest_version_number()} has been installed -> {deploy_uri + deploy_prefix}"
+    )
+    # if clean is True clean default themes and plugins from
 
 
 @app.command()
@@ -138,28 +163,28 @@ def download_plugin(plugin_name: str):
     endpoint = f"https://api.wordpress.org/plugins/info/1.1/?action=query_plugins&request[search]={plugin_name}"
     params = {
         # fields we want
-        'name': True,
-        'author': True,
-        'slug': True,
-        'downloadlink': True,
+        "name": True,
+        "author": True,
+        "slug": True,
+        "downloadlink": True,
         # fields we dont want
-        'rating': False,
-        'ratings': False,
-        'downloaded': False,
-        'description': False,
-        'active_installs': False,
-        'short_description': False,
-        'donate_link': False,
-        'tags': False,
-        'sections': False,
-        'homepage': False,
-        'last_updated': False,
-        'compatibility': False,
-        'tested': False,
-        'requires': False,
-        'versions': False,
-        'support_threads': False,
-        'support_threads_resolved': False,
+        "rating": False,
+        "ratings": False,
+        "downloaded": False,
+        "description": False,
+        "active_installs": False,
+        "short_description": False,
+        "donate_link": False,
+        "tags": False,
+        "sections": False,
+        "homepage": False,
+        "last_updated": False,
+        "compatibility": False,
+        "tested": False,
+        "requires": False,
+        "versions": False,
+        "support_threads": False,
+        "support_threads_resolved": False,
     }
 
     endpoint = endpoint + parse_params(params)
@@ -179,7 +204,7 @@ def download_plugin(plugin_name: str):
             max_hits += max_hits
         typer.echo(
             f"{typer.style(str(i+1), fg=typer.colors.RED, bold=True)} - {name}")
-        matches[i+1] = plugin.get("name")
+        matches[i + 1] = plugin.get("name")
     print(matches)
 
 
@@ -192,10 +217,13 @@ def show_deploy(deploy_name: str = False, list_all: bool = False):
         for directory in os.listdir(os.path.realpath(root_path)):
             if deploy_prefix not in directory:
                 continue
-            typer.echo(f"{directory.replace(deploy_prefix, '')} -> {os.path.realpath(root_path)}")
+            typer.echo(
+                f"{directory.replace(deploy_prefix, '')} -> {os.path.realpath(root_path)}"
+            )
         return
     if os.path.exists(os.path.join(root_path, deploy_name + deploy_prefix)):
-        typer.echo(f"Deploy exists under -> {os.path.join(root_path, deploy_name)}")
+        typer.echo(
+            f"Deploy exists under -> {os.path.join(root_path, deploy_name)}")
     else:
         typer.echo(f"No deploy with {deploy_name} was found ...")
 

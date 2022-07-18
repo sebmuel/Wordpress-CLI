@@ -3,3 +3,6 @@
 __pycache__/
 versions
 .vscode
+classes/config.json
+.sql
+test.py
