@@ -1,6 +1,7 @@
 from classes.versions.VersionController import VersionController
 
-class CoreController:
 
+class CoreController:
+    
     def __init__(self) -> None:
         self.version_controller = VersionController()

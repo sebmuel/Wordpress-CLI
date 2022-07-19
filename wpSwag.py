@@ -1,13 +1,10 @@
-import json
 from classes.App import WpApp
 
 
 def main():
 
     app = WpApp()
-    app.verify_folders()
-    app.update()
-
+    app.run()
 
 if __name__ == '__main__':
     main()

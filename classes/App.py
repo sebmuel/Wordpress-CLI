@@ -1,17 +1,17 @@
 import typer
 import os
 from classes.CoreController import CoreController
+from classes.Config import WpConfig
 
 
 class WpApp:
 
     cli = typer.Typer()
     core = CoreController()
+    config = WpConfig()
 
-    @staticmethod
-    def run(action):
+    def run(self):
         WpApp.cli()
-        action()
 
     @staticmethod
     def verify_folders(specifc: str = None):
@@ -22,9 +22,15 @@ class WpApp:
     @staticmethod
     @cli.command()
     def update():
-        WpApp.core.version_controller.run_command(function="update")
+        WpApp.core.version_controller.update()
 
     @staticmethod
     @cli.command()
-    def update2():
-        pass
+    def get_latest():
+        root = WpApp.config.cnf["root"]
+        WpApp.core.version_controller.get_latest(root)
+        
+    @staticmethod
+    @cli.command()
+    def show_latest_zip():
+        WpApp.core.version_controller.get_current_zip_version()

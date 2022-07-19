@@ -139,7 +139,6 @@ def create_deploy(name: str, clean: bool = False):
         return
     # TODO check if verison exists
     deploy_uri = os.path.join(root_path, name)
-    print(deploy_uri + deploy_prefix)
     if os.path.exists(deploy_uri + deploy_prefix):
         typer.echo(f"Deploy with the name: '{name}' already exists")
         return
